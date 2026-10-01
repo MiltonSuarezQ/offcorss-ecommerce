@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import type { Product } from '../services/product.service';
 
 interface ProductDetailProps {
@@ -12,7 +12,10 @@ function ProductDetail({
 }: ProductDetailProps) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
+  const [zoomPosition, setZoomPosition] = useState({
+    x: 50,
+    y: 50,
+  });
 
   const handlePrint = () => {
     window.print();
@@ -23,22 +26,33 @@ function ProductDetail({
 
   const showPreviousImage = () => {
     setActiveImageIndex((current) =>
-      current === 0 ? images.length - 1 : current - 1
+      current === 0
+        ? images.length - 1
+        : current - 1
     );
   };
 
   const showNextImage = () => {
     setActiveImageIndex((current) =>
-      current === images.length - 1 ? 0 : current + 1
+      current === images.length - 1
+        ? 0
+        : current + 1
     );
   };
 
   const handleImageMouseMove = (
-    event: React.MouseEvent<HTMLDivElement>
+    event: MouseEvent<HTMLDivElement>
   ) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width) * 100;
-    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    const rect =
+      event.currentTarget.getBoundingClientRect();
+
+    const x =
+      ((event.clientX - rect.left) / rect.width) *
+      100;
+
+    const y =
+      ((event.clientY - rect.top) / rect.height) *
+      100;
 
     setZoomPosition({
       x: Math.max(0, Math.min(100, x)),
@@ -54,38 +68,62 @@ function ProductDetail({
 
   const handleImageMouseLeave = () => {
     setIsZoomed(false);
-    setZoomPosition({ x: 50, y: 50 });
+    setZoomPosition({
+      x: 50,
+      y: 50,
+    });
   };
 
   const changeImage = (index: number) => {
     setActiveImageIndex(index);
     setIsZoomed(false);
-    setZoomPosition({ x: 50, y: 50 });
+    setZoomPosition({
+      x: 50,
+      y: 50,
+    });
   };
 
   return (
-    <section className="product-detail-page">
-      <button
-        type="button"
-        className="back-button"
-        onClick={onBack}
-      >
-        ← Volver a productos
-      </button>
-
-      <div className="detail-header">
+    <section
+      className="product-detail-page"
+      aria-labelledby="product-detail-title"
+    >
+      <div className="products-header">
         <div>
-          <div className="page-eyebrow">CATÁLOGO</div>
-          <h1>Detalle del producto</h1>
-          <p>Información detallada del producto seleccionado.</p>
+          <div className="page-eyebrow">
+            CATÁLOGO
+          </div>
+
+          <h1 id="product-detail-title">
+            Detalle del producto
+          </h1>
+
+          <p>
+            Información detallada del producto
+            seleccionado.
+          </p>
         </div>
+      </div>
+
+      <div className="detail-toolbar">
+        <button
+          type="button"
+          className="back-button"
+          onClick={onBack}
+        >
+          ← Volver a productos
+        </button>
       </div>
 
       <div className="detail-card">
         <div className="detail-layout">
           <div className="detail-gallery">
             <div
-              className={`detail-image-wrapper ${isZoomed ? 'detail-image-zoomed' : ''}`}
+              className={`detail-image-wrapper ${
+                isZoomed
+                  ? 'detail-image-zoomed'
+                  : ''
+              }`}
               onMouseMove={handleImageMouseMove}
               onMouseEnter={handleImageMouseEnter}
               onMouseLeave={handleImageMouseLeave}
@@ -99,20 +137,27 @@ function ProductDetail({
                     srcSet={`${activeImage.imageUrl} 1x, ${activeImage.imageUrl} 2x`}
                     alt={
                       activeImage.imageText ||
-                      `${product.productTitle} - imagen ${activeImageIndex + 1}`
+                      `${product.productTitle} - imagen ${
+                        activeImageIndex + 1
+                      }`
                     }
                     loading="eager"
                     decoding="async"
                     width="600"
                     height="600"
                     style={{
-                      transform: isZoomed ? 'scale(2)' : 'scale(1)',
+                      transform: isZoomed
+                        ? 'scale(2)'
+                        : 'scale(1)',
                       transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
                     }}
                   />
 
                   {isZoomed && (
-                    <div className="zoom-hint">
+                    <div
+                      className="zoom-hint"
+                      aria-hidden="true"
+                    >
                       Zoom
                     </div>
                   )}
@@ -137,14 +182,21 @@ function ProductDetail({
                         ›
                       </button>
 
-                      <div className="gallery-counter">
-                        {activeImageIndex + 1} / {images.length}
+                      <div
+                        className="gallery-counter"
+                        aria-live="polite"
+                      >
+                        {activeImageIndex + 1} /{' '}
+                        {images.length}
                       </div>
                     </>
                   )}
                 </>
               ) : (
-                <div className="empty-state">
+                <div
+                  className="empty-state"
+                  role="status"
+                >
                   Sin imagen disponible
                 </div>
               )}
@@ -164,17 +216,25 @@ function ProductDetail({
                         ? 'detail-thumbnail-active'
                         : ''
                     }`}
-                    onClick={() => changeImage(index)}
-                    aria-label={`Ver imagen ${index + 1}`}
+                    onClick={() =>
+                      changeImage(index)
+                    }
+                    aria-label={`Ver imagen ${
+                      index + 1
+                    }`}
                     aria-current={
-                      index === activeImageIndex ? 'true' : undefined
+                      index === activeImageIndex
+                        ? 'true'
+                        : undefined
                     }
                   >
                     <img
                       src={image.imageUrl}
                       alt={
                         image.imageText ||
-                        `${product.productTitle} - miniatura ${index + 1}`
+                        `${product.productTitle} - miniatura ${
+                          index + 1
+                        }`
                       }
                       loading="lazy"
                       decoding="async"
@@ -196,40 +256,52 @@ function ProductDetail({
               {product.productTitle}
             </h2>
 
-            <div className="detail-fields">
+            <dl className="detail-fields">
               <div className="detail-field">
-                <strong>Product ID</strong>
-                <span>{product.productId}</span>
+                <dt>Product ID</dt>
+                <dd>{product.productId}</dd>
               </div>
 
               <div className="detail-field">
-                <strong>Marca</strong>
-                <span>{product.brand || 'No disponible'}</span>
+                <dt>Marca</dt>
+                <dd>
+                  {product.brand ||
+                    'No disponible'}
+                </dd>
               </div>
 
               <div className="detail-field">
-                <strong>Link del producto</strong>
-                <span>{product.linkText || 'No disponible'}</span>
+                <dt>Link del producto</dt>
+                <dd>
+                  {product.linkText ||
+                    'No disponible'}
+                </dd>
               </div>
 
               <div className="detail-field">
-                <strong>Categorías</strong>
-                <span>
+                <dt>Categorías</dt>
+                <dd>
                   {product.categories.length > 0
-                    ? product.categories.join(' / ')
+                    ? product.categories.join(
+                        ' / '
+                      )
                     : 'No disponibles'}
-                </span>
+                </dd>
               </div>
 
               <div className="detail-field">
-                <strong>Items / SKUs</strong>
-                <span>
+                <dt>Items / SKUs</dt>
+                <dd>
                   {product.items.length > 0
-                    ? product.items.map((item) => item.itemId).join(', ')
+                    ? product.items
+                        .map(
+                          (item) => item.itemId
+                        )
+                        .join(', ')
                     : 'No disponibles'}
-                </span>
+                </dd>
               </div>
-            </div>
+            </dl>
 
             <div className="detail-actions">
               <button

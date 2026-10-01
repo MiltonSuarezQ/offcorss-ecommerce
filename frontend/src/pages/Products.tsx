@@ -30,34 +30,47 @@ function Products() {
     return Math.ceil(totalProducts / PRODUCTS_PER_PAGE);
   }, [totalProducts]);
 
-  const loadProducts = async (
-    searchValue?: string,
-    page = 1
-  ) => {
-    try {
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchProducts = async () => {
       setLoading(true);
       setError('');
 
-      const result = await getProducts(
-        searchValue,
-        page,
-        PRODUCTS_PER_PAGE
-      );
+      try {
+        const result = await getProducts(
+          activeSearch,
+          currentPage,
+          PRODUCTS_PER_PAGE
+        );
 
-      setProducts(result.products);
-      setCurrentPage(result.page);
-      setTotalProducts(result.total);
-      setHasNextPage(result.hasNextPage);
-    } catch (err) {
-      console.error(err);
-      setError('No fue posible cargar los productos.');
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (cancelled) {
+          return;
+        }
 
-  useEffect(() => {
-    loadProducts(activeSearch, currentPage);
+        setProducts(result.products);
+        setCurrentPage(result.page);
+        setTotalProducts(result.total);
+        setHasNextPage(result.hasNextPage);
+      } catch (err) {
+        if (cancelled) {
+          return;
+        }
+
+        console.error(err);
+        setError('No fue posible cargar los productos.');
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void fetchProducts();
+
+    return () => {
+      cancelled = true;
+    };
   }, [activeSearch, currentPage]);
 
   const handleSearch = () => {
@@ -271,14 +284,17 @@ function Products() {
   }
 
   return (
-    <section className="products-page">
+    <section
+      className="products-page"
+      aria-labelledby="products-title"
+    >
       <div className="products-header">
         <div>
           <div className="page-eyebrow">
             CATÁLOGO
           </div>
 
-          <h1>Productos</h1>
+          <h1 id="products-title">Productos</h1>
 
           <p>
             Consulta y administra el catálogo
@@ -296,31 +312,40 @@ function Products() {
         </div>
       </div>
 
-      <div className="search-container">
+      <form
+        className="search-container"
+        role="search"
+        onSubmit={(event) => {
+          event.preventDefault();
+          handleSearch();
+        }}
+      >
+        <label
+          className="sr-only"
+          htmlFor="product-search"
+        >
+          Buscar producto
+        </label>
+
         <input
-          type="text"
+          id="product-search"
+          name="search"
+          type="search"
           className="search-input"
           placeholder="Buscar producto..."
           value={search}
           onChange={(event) =>
             setSearch(event.target.value)
           }
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              handleSearch();
-            }
-          }}
-          aria-label="Buscar producto"
         />
 
         <button
-          type="button"
+          type="submit"
           className="search-button"
-          onClick={handleSearch}
         >
           Buscar
         </button>
-      </div>
+      </form>
 
       <div className="products-actions">
         <button
@@ -343,13 +368,20 @@ function Products() {
       </div>
 
       {loading && (
-        <div className="loading-state">
+        <div
+          className="loading-state"
+          role="status"
+          aria-live="polite"
+        >
           Cargando productos...
         </div>
       )}
 
       {error && (
-        <div className="error-state">
+        <div
+          className="error-state"
+          role="alert"
+        >
           {error}
         </div>
       )}
@@ -357,7 +389,10 @@ function Products() {
       {!loading &&
         !error &&
         products.length === 0 && (
-          <div className="empty-state">
+          <div
+            className="empty-state"
+            role="status"
+          >
             No se encontraron productos.
           </div>
         )}
@@ -368,6 +403,10 @@ function Products() {
           <>
             <div className="table-container">
               <table className="products-table">
+                <caption className="sr-only">
+                  Catálogo de productos de OFFCORSS
+                </caption>
+
                 <thead>
                   <tr>
                     <th scope="col">
@@ -448,7 +487,10 @@ function Products() {
                                 height="64"
                               />
                             ) : (
-                              <div className="product-image product-image-empty">
+                              <div
+                                className="product-image product-image-empty"
+                                aria-hidden="true"
+                              >
                                 —
                               </div>
                             )}
@@ -488,7 +530,10 @@ function Products() {
             </div>
 
             {totalPages > 1 && (
-              <div className="pagination">
+              <nav
+                className="pagination"
+                aria-label="Paginación de productos"
+              >
                 <button
                   type="button"
                   onClick={handlePreviousPage}
@@ -509,6 +554,7 @@ function Products() {
                           <span
                             key={`ellipsis-${index}`}
                             className="pagination-ellipsis"
+                            aria-hidden="true"
                           >
                             …
                           </span>
@@ -523,6 +569,11 @@ function Products() {
                             page === currentPage
                               ? 'pagination-page-active'
                               : ''
+                          }
+                          aria-current={
+                            page === currentPage
+                              ? 'page'
+                              : undefined
                           }
                           onClick={() =>
                             handlePageChange(
@@ -549,7 +600,7 @@ function Products() {
                 >
                   Siguiente →
                 </button>
-              </div>
+              </nav>
             )}
 
             {totalPages > 0 && (

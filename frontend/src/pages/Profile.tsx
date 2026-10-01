@@ -47,8 +47,8 @@ function Profile({
       }
     };
 
-    loadUser();
-  }, []);
+    void loadUser();
+  }, [onUserUpdated]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -101,8 +101,16 @@ function Profile({
 
   if (loading) {
     return (
-      <section className="profile-page">
-        <div className="profile-loading">
+      <section
+        className="profile-page"
+        aria-labelledby="profile-loading-title"
+      >
+        <div
+          className="profile-loading"
+          id="profile-loading-title"
+          role="status"
+          aria-live="polite"
+        >
           Cargando información del perfil...
         </div>
       </section>
@@ -110,8 +118,10 @@ function Profile({
   }
 
   return (
-    <section className="profile-page">
-
+    <section
+      className="profile-page"
+      aria-labelledby="profile-title"
+    >
       <button
         type="button"
         className="back-button"
@@ -126,7 +136,9 @@ function Profile({
             CUENTA
           </div>
 
-          <h1>Mi perfil</h1>
+          <h1 id="profile-title">
+            Mi perfil
+          </h1>
 
           <p>
             Consulta y actualiza tu información personal.
@@ -135,9 +147,11 @@ function Profile({
       </div>
 
       <div className="profile-card">
-
         <div className="profile-card-header">
-          <div className="profile-avatar-large">
+          <div
+            className="profile-avatar-large"
+            aria-hidden="true"
+          >
             {user.name.charAt(0).toUpperCase()}
           </div>
 
@@ -156,18 +170,20 @@ function Profile({
           className="profile-form"
           onSubmit={handleSubmit}
         >
-
           <div className="profile-section">
             <div className="profile-section-title">
               Información de cuenta
             </div>
 
             <div className="profile-grid">
-
               <div className="profile-field">
-                <label>Usuario</label>
+                <label htmlFor="username">
+                  Usuario
+                </label>
 
                 <input
+                  id="username"
+                  name="username"
                   type="text"
                   value={user.username}
                   disabled
@@ -175,9 +191,13 @@ function Profile({
               </div>
 
               <div className="profile-field">
-                <label>Tipo de usuario</label>
+                <label htmlFor="userType">
+                  Tipo de usuario
+                </label>
 
                 <input
+                  id="userType"
+                  name="userType"
                   type="text"
                   value={user.userType}
                   disabled
@@ -185,9 +205,13 @@ function Profile({
               </div>
 
               <div className="profile-field">
-                <label>Fecha de creación</label>
+                <label htmlFor="createDate">
+                  Fecha de creación
+                </label>
 
                 <input
+                  id="createDate"
+                  name="createDate"
                   type="text"
                   value={new Date(
                     user.createDate
@@ -195,18 +219,15 @@ function Profile({
                   disabled
                 />
               </div>
-
             </div>
           </div>
 
           <div className="profile-section">
-
             <div className="profile-section-title">
               Información personal
             </div>
 
             <div className="profile-grid">
-
               <div className="profile-field">
                 <label htmlFor="name">
                   Nombre
@@ -251,18 +272,24 @@ function Profile({
                   required
                 />
               </div>
-
             </div>
           </div>
 
           {error && (
-            <div className="profile-message profile-message-error">
+            <div
+              className="profile-message profile-message-error"
+              role="alert"
+            >
               {error}
             </div>
           )}
 
           {success && (
-            <div className="profile-message profile-message-success">
+            <div
+              className="profile-message profile-message-success"
+              role="status"
+              aria-live="polite"
+            >
               {success}
             </div>
           )}
@@ -278,10 +305,8 @@ function Profile({
                 : 'Guardar cambios'}
             </button>
           </div>
-
         </form>
       </div>
-
     </section>
   );
 }

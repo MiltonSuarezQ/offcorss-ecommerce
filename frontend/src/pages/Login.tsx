@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import axios from 'axios';
 
 interface User {
@@ -26,9 +26,7 @@ function Login({ onLogin }: LoginProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setError('');
@@ -83,6 +81,7 @@ function Login({ onLogin }: LoginProps) {
 
             <input
               id="username"
+              name="username"
               type="text"
               value={username}
               onChange={(event) =>
@@ -101,6 +100,7 @@ function Login({ onLogin }: LoginProps) {
 
             <input
               id="password"
+              name="password"
               type="password"
               value={password}
               onChange={(event) =>
@@ -113,7 +113,10 @@ function Login({ onLogin }: LoginProps) {
           </div>
 
           {error && (
-            <p className="error-message">
+            <p
+              className="error-message"
+              role="alert"
+            >
               {error}
             </p>
           )}

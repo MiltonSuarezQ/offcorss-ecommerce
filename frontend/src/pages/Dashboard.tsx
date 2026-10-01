@@ -19,7 +19,11 @@ interface DashboardProps {
   onUserUpdated: (user: User) => void;
 }
 
-function Dashboard({ user, onLogout, onUserUpdated }: DashboardProps) {
+function Dashboard({
+  user,
+  onLogout,
+  onUserUpdated,
+}: DashboardProps) {
   const [activeView, setActiveView] = useState<
     'dashboard' | 'products' | 'profile'
   >('dashboard');
@@ -33,49 +37,99 @@ function Dashboard({ user, onLogout, onUserUpdated }: DashboardProps) {
             src="https://offcorss.vtexassets.com/arquivos/header__logo-offcorss.png"
             alt="OFFCORSS"
           />
-          <div className="brand-subtitle">E-commerce Platform</div>
+
+          <div className="brand-subtitle">
+            E-commerce Platform
+          </div>
         </div>
 
-        <div className="sidebar-section-title">MENÚ</div>
+        <div className="sidebar-section-title">
+          MENÚ
+        </div>
 
-        <nav className="sidebar-nav" aria-label="Navegación principal">
+        <nav
+          className="sidebar-nav"
+          aria-label="Navegación principal"
+        >
           <button
             type="button"
             className={`nav-item ${
-              activeView === 'dashboard' ? 'nav-item-active' : ''
+              activeView === 'dashboard'
+                ? 'nav-item-active'
+                : ''
             }`}
             onClick={() => setActiveView('dashboard')}
+            aria-current={
+              activeView === 'dashboard'
+                ? 'page'
+                : undefined
+            }
           >
-            <span className="nav-icon">⌂</span>
+            <span
+              className="nav-icon"
+              aria-hidden="true"
+            >
+              ⌂
+            </span>
+
             <span>Dashboard</span>
           </button>
 
           <button
             type="button"
             className={`nav-item ${
-              activeView === 'products' ? 'nav-item-active' : ''
+              activeView === 'products'
+                ? 'nav-item-active'
+                : ''
             }`}
             onClick={() => setActiveView('products')}
+            aria-current={
+              activeView === 'products'
+                ? 'page'
+                : undefined
+            }
           >
-            <span className="nav-icon">▦</span>
+            <span
+              className="nav-icon"
+              aria-hidden="true"
+            >
+              ▦
+            </span>
+
             <span>Productos</span>
           </button>
 
           <button
             type="button"
             className={`nav-item ${
-              activeView === 'profile' ? 'nav-item-active' : ''
+              activeView === 'profile'
+                ? 'nav-item-active'
+                : ''
             }`}
             onClick={() => setActiveView('profile')}
+            aria-current={
+              activeView === 'profile'
+                ? 'page'
+                : undefined
+            }
           >
-            <span className="nav-icon">◉</span>
+            <span
+              className="nav-icon"
+              aria-hidden="true"
+            >
+              ◉
+            </span>
+
             <span>Mi perfil</span>
           </button>
         </nav>
 
         <div className="sidebar-footer">
           <div className="sidebar-user">
-            <div className="user-avatar">
+            <div
+              className="user-avatar"
+              aria-hidden="true"
+            >
               {user.name.charAt(0).toUpperCase()}
             </div>
 
@@ -90,7 +144,7 @@ function Dashboard({ user, onLogout, onUserUpdated }: DashboardProps) {
             className="sidebar-logout"
             onClick={onLogout}
           >
-            <span>↪</span>
+            <span aria-hidden="true">↪</span>
             Cerrar sesión
           </button>
         </div>
@@ -99,12 +153,20 @@ function Dashboard({ user, onLogout, onUserUpdated }: DashboardProps) {
       <div className="main-area">
         <header className="topbar">
           <div>
-            <span className="topbar-label">Plataforma E-commerce</span>
-            <span className="topbar-title">OFFCORSS</span>
+            <span className="topbar-label">
+              Plataforma E-commerce
+            </span>
+
+            <span className="topbar-title">
+              OFFCORSS
+            </span>
           </div>
 
           <div className="topbar-user">
-            <div className="topbar-avatar">
+            <div
+              className="topbar-avatar"
+              aria-hidden="true"
+            >
               {user.name.charAt(0).toUpperCase()}
             </div>
 
@@ -112,6 +174,7 @@ function Dashboard({ user, onLogout, onUserUpdated }: DashboardProps) {
               <strong>
                 {user.name} {user.lastName}
               </strong>
+
               <span>{user.email}</span>
             </div>
           </div>
@@ -128,7 +191,9 @@ function Dashboard({ user, onLogout, onUserUpdated }: DashboardProps) {
             <Profile
               user={user}
               onUserUpdated={onUserUpdated}
-              onBack={() => setActiveView('dashboard')}
+              onBack={() =>
+                setActiveView('dashboard')
+              }
             />
           )}
         </main>
