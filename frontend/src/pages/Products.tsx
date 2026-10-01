@@ -9,7 +9,6 @@ const PRODUCTS_PER_PAGE = 10;
 
 function Products() {
   const [products, setProducts] = useState<Product[]>([]);
-
   const [search, setSearch] = useState('');
   const [activeSearch, setActiveSearch] = useState<string | undefined>(
     undefined
@@ -27,17 +26,10 @@ function Products() {
     null
   );
 
-  /*
-   * Total de páginas según el total real
-   * que devuelve VTEX.
-   */
   const totalPages = useMemo(() => {
     return Math.ceil(totalProducts / PRODUCTS_PER_PAGE);
   }, [totalProducts]);
 
-  /*
-   * Cargar productos desde el backend.
-   */
   const loadProducts = async (
     searchValue?: string,
     page = 1
@@ -58,38 +50,20 @@ function Products() {
       setHasNextPage(result.hasNextPage);
     } catch (err) {
       console.error(err);
-
-      setError(
-        'No fue posible cargar los productos.'
-      );
+      setError('No fue posible cargar los productos.');
     } finally {
       setLoading(false);
     }
   };
 
-  /*
-   * Carga inicial y cambio de página/búsqueda.
-   */
   useEffect(() => {
-    loadProducts(
-      activeSearch,
-      currentPage
-    );
+    loadProducts(activeSearch, currentPage);
   }, [activeSearch, currentPage]);
 
-  /*
-   * Ejecutar búsqueda.
-   */
   const handleSearch = () => {
     const value = search.trim() || undefined;
 
     setSelectedProducts([]);
-
-    /*
-     * Si ya estamos en página 1, el useEffect
-     * no se ejecutaría porque currentPage no cambia.
-     * Por eso actualizamos activeSearch directamente.
-     */
     setActiveSearch(value);
 
     if (currentPage !== 1) {
@@ -97,27 +71,18 @@ function Products() {
     }
   };
 
-  /*
-   * Página anterior.
-   */
   const handlePreviousPage = () => {
     if (currentPage > 1 && !loading) {
       setCurrentPage((page) => page - 1);
     }
   };
 
-  /*
-   * Página siguiente.
-   */
   const handleNextPage = () => {
     if (hasNextPage && !loading) {
       setCurrentPage((page) => page + 1);
     }
   };
 
-  /*
-   * Ir directamente a una página.
-   */
   const handlePageChange = (page: number) => {
     if (
       page >= 1 &&
@@ -129,29 +94,21 @@ function Products() {
     }
   };
 
-  /*
-   * Verificar si un producto está seleccionado.
-   */
   const isSelected = (productId: string) => {
     return selectedProducts.some(
       (product) => product.productId === productId
     );
   };
 
-  /*
-   * Seleccionar/deseleccionar producto.
-   */
   const toggleProduct = (product: Product) => {
     setSelectedProducts((current) => {
       const exists = current.some(
-        (item) =>
-          item.productId === product.productId
+        (item) => item.productId === product.productId
       );
 
       if (exists) {
         return current.filter(
-          (item) =>
-            item.productId !== product.productId
+          (item) => item.productId !== product.productId
         );
       }
 
@@ -159,10 +116,6 @@ function Products() {
     });
   };
 
-  /*
-   * Saber si todos los productos de la página
-   * actual están seleccionados.
-   */
   const allCurrentPageSelected = useMemo(() => {
     return (
       products.length > 0 &&
@@ -175,10 +128,6 @@ function Products() {
     );
   }, [products, selectedProducts]);
 
-  /*
-   * Seleccionar/deseleccionar todos los productos
-   * de la página actual.
-   */
   const toggleAllCurrentPage = () => {
     if (allCurrentPageSelected) {
       setSelectedProducts((current) =>
@@ -186,8 +135,7 @@ function Products() {
           (selected) =>
             !products.some(
               (product) =>
-                product.productId ===
-                selected.productId
+                product.productId === selected.productId
             )
         )
       );
@@ -197,32 +145,17 @@ function Products() {
 
     setSelectedProducts((current) => {
       const existingIds = new Set(
-        current.map(
-          (product) => product.productId
-        )
+        current.map((product) => product.productId)
       );
 
       const newProducts = products.filter(
-        (product) =>
-          !existingIds.has(product.productId)
+        (product) => !existingIds.has(product.productId)
       );
 
-      return [
-        ...current,
-        ...newProducts,
-      ];
+      return [...current, ...newProducts];
     });
   };
 
-  /*
-   * Exportar productos seleccionados.
-   *
-   * Si hay productos seleccionados:
-   * exporta esos productos.
-   *
-   * Si no hay selección:
-   * exporta los productos de la página actual.
-   */
   const exportToCsv = () => {
     const dataToExport =
       selectedProducts.length > 0
@@ -242,18 +175,16 @@ function Products() {
       'Link',
     ];
 
-    const rows = dataToExport.map(
-      (product) => [
-        product.productId,
-        product.productTitle,
-        product.brand,
-        product.items
-          .map((item) => item.itemId)
-          .join(' | '),
-        product.categories.join(' | '),
-        product.linkText || '',
-      ]
-    );
+    const rows = dataToExport.map((product) => [
+      product.productId,
+      product.productTitle,
+      product.brand,
+      product.items
+        .map((item) => item.itemId)
+        .join(' | '),
+      product.categories.join(' | '),
+      product.linkText || '',
+    ]);
 
     const csv = [
       headers,
@@ -263,47 +194,29 @@ function Products() {
         row
           .map(
             (value) =>
-              `"${String(value).replace(
-                /"/g,
-                '""'
-              )}"`
+              `"${String(value).replace(/"/g, '""')}"`
           )
           .join(',')
       )
       .join('\n');
 
-    const blob = new Blob(
-      [csv],
-      {
-        type: 'text/csv;charset=utf-8;',
-      }
-    );
+    const blob = new Blob([csv], {
+      type: 'text/csv;charset=utf-8;',
+    });
 
-    const url =
-      URL.createObjectURL(blob);
-
-    const link =
-      document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
 
     link.href = url;
-    link.download =
-      'offcorss-productos.csv';
+    link.download = 'offcorss-productos.csv';
 
     document.body.appendChild(link);
-
     link.click();
-
     document.body.removeChild(link);
 
     URL.revokeObjectURL(url);
   };
 
-  /*
-   * Generar números de página.
-   *
-   * Ejemplo:
-   * 1 2 3 4 5 ... 25
-   */
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
 
@@ -325,11 +238,7 @@ function Products() {
       pages.push('...');
     }
 
-    const start = Math.max(
-      2,
-      currentPage - 1
-    );
-
+    const start = Math.max(2, currentPage - 1);
     const end = Math.min(
       totalPages - 1,
       currentPage + 1
@@ -352,37 +261,24 @@ function Products() {
     return pages;
   };
 
-  /*
-   * Mostrar detalle del producto.
-   */
   if (selectedProduct) {
     return (
       <ProductDetail
         product={selectedProduct}
-        onBack={() =>
-          setSelectedProduct(null)
-        }
+        onBack={() => setSelectedProduct(null)}
       />
     );
   }
 
   return (
     <section className="products-page">
-
-      {/* =====================================================
-          HEADER
-      ===================================================== */}
-
       <div className="products-header">
-
         <div>
           <div className="page-eyebrow">
             CATÁLOGO
           </div>
 
-          <h1>
-            Productos
-          </h1>
+          <h1>Productos</h1>
 
           <p>
             Consulta y administra el catálogo
@@ -398,15 +294,9 @@ function Products() {
             ? 'producto'
             : 'productos'}
         </div>
-
       </div>
 
-      {/* =====================================================
-          BUSCADOR
-      ===================================================== */}
-
       <div className="search-container">
-
         <input
           type="text"
           className="search-input"
@@ -420,6 +310,7 @@ function Products() {
               handleSearch();
             }
           }}
+          aria-label="Buscar producto"
         />
 
         <button
@@ -429,15 +320,9 @@ function Products() {
         >
           Buscar
         </button>
-
       </div>
 
-      {/* =====================================================
-          ACTIONS
-      ===================================================== */}
-
       <div className="products-actions">
-
         <button
           type="button"
           className="export-button"
@@ -452,16 +337,10 @@ function Products() {
 
         {selectedProducts.length > 0 && (
           <span className="selected-count">
-            {selectedProducts.length}{' '}
-            seleccionados
+            {selectedProducts.length} seleccionados
           </span>
         )}
-
       </div>
-
-      {/* =====================================================
-          LOADING
-      ===================================================== */}
 
       {loading && (
         <div className="loading-state">
@@ -469,19 +348,11 @@ function Products() {
         </div>
       )}
 
-      {/* =====================================================
-          ERROR
-      ===================================================== */}
-
       {error && (
         <div className="error-state">
           {error}
         </div>
       )}
-
-      {/* =====================================================
-          EMPTY
-      ===================================================== */}
 
       {!loading &&
         !error &&
@@ -491,226 +362,149 @@ function Products() {
           </div>
         )}
 
-      {/* =====================================================
-          TABLE
-      ===================================================== */}
-
       {!loading &&
         !error &&
         products.length > 0 && (
           <>
-
             <div className="table-container">
-
               <table className="products-table">
-
                 <thead>
-
                   <tr>
-
-                    <th>
+                    <th scope="col">
                       <input
                         type="checkbox"
-                        checked={
-                          allCurrentPageSelected
-                        }
-                        onChange={
-                          toggleAllCurrentPage
-                        }
-                        aria-label="Seleccionar todos"
+                        checked={allCurrentPageSelected}
+                        onChange={toggleAllCurrentPage}
+                        aria-label="Seleccionar todos los productos"
                       />
                     </th>
 
-                    <th>
+                    <th scope="col">
                       Producto
                     </th>
 
-                    <th>
+                    <th scope="col">
                       Marca
                     </th>
 
-                    <th>
+                    <th scope="col">
                       Product ID
                     </th>
 
-                    <th>
+                    <th scope="col">
                       Items / SKUs
                     </th>
-
                   </tr>
-
                 </thead>
 
                 <tbody>
+                  {products.map((product) => {
+                    const selected = isSelected(
+                      product.productId
+                    );
 
-                  {products.map(
-                    (product) => {
+                    const image = product.images[0];
 
-                      const selected =
-                        isSelected(
-                          product.productId
-                        );
-
-                      const image =
-                        product.images[0];
-
-                      return (
-                        <tr
-                          key={
-                            product.productId
-                          }
-                          className={
-                            selected
-                              ? 'row-selected'
-                              : ''
-                          }
-                          onClick={() =>
-                            setSelectedProduct(
-                              product
-                            )
+                    return (
+                      <tr
+                        key={product.productId}
+                        className={
+                          selected
+                            ? 'row-selected'
+                            : ''
+                        }
+                        onClick={() =>
+                          setSelectedProduct(product)
+                        }
+                      >
+                        <td
+                          onClick={(event) =>
+                            event.stopPropagation()
                           }
                         >
-
-                          {/* CHECKBOX */}
-
-                          <td
-                            onClick={(
-                              event
-                            ) =>
-                              event.stopPropagation()
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={() =>
+                              toggleProduct(product)
                             }
-                          >
+                            aria-label={`Seleccionar ${product.productTitle}`}
+                          />
+                        </td>
 
-                            <input
-                              type="checkbox"
-                              checked={
-                                selected
-                              }
-                              onChange={() =>
-                                toggleProduct(
-                                  product
-                                )
-                              }
-                              aria-label={`Seleccionar ${product.productTitle}`}
-                            />
+                        <td>
+                          <div className="product-cell">
+                            {image ? (
+                              <img
+                                className="product-image"
+                                src={image.imageUrl}
+                                alt={
+                                  image.imageText ||
+                                  product.productTitle
+                                }
+                                loading="lazy"
+                                decoding="async"
+                                width="64"
+                                height="64"
+                              />
+                            ) : (
+                              <div className="product-image product-image-empty">
+                                —
+                              </div>
+                            )}
 
-                          </td>
-
-                          {/* PRODUCTO */}
-
-                          <td>
-
-                            <div className="product-cell">
-
-                              {image ? (
-                                <img
-                                  className="product-image"
-                                  src={
-                                    image.imageUrl
-                                  }
-                                  alt={
-                                    image.imageText ||
-                                    product.productTitle
-                                  }
-                                />
-                              ) : (
-                                <div className="product-image product-image-empty">
-                                  —
-                                </div>
-                              )}
-
-                              <div>
-
-                                <div className="product-name">
-                                  {
-                                    product.productTitle
-                                  }
-                                </div>
-
-                                <div className="product-brand">
-                                  {
-                                    product.brand
-                                  }
-                                </div>
-
+                            <div>
+                              <div className="product-name">
+                                {product.productTitle}
                               </div>
 
+                              <div className="product-brand">
+                                {product.brand}
+                              </div>
                             </div>
+                          </div>
+                        </td>
 
-                          </td>
+                        <td>
+                          {product.brand}
+                        </td>
 
-                          {/* MARCA */}
+                        <td>
+                          <span className="product-id">
+                            {product.productId}
+                          </span>
+                        </td>
 
-                          <td>
-                            {
-                              product.brand
-                            }
-                          </td>
-
-                          {/* PRODUCT ID */}
-
-                          <td>
-
-                            <span className="product-id">
-                              {
-                                product.productId
-                              }
-                            </span>
-
-                          </td>
-
-                          {/* SKUS */}
-
-                          <td>
-
-                            <span className="items-cell">
-                              {
-                                product.items
-                                  .length
-                              }
-                            </span>
-
-                          </td>
-
-                        </tr>
-                      );
-                    }
-                  )}
-
+                        <td>
+                          <span className="items-cell">
+                            {product.items.length}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
-
               </table>
-
             </div>
-
-            {/* =================================================
-                PAGINATION
-            ================================================= */}
 
             {totalPages > 1 && (
               <div className="pagination">
-
                 <button
                   type="button"
-                  onClick={
-                    handlePreviousPage
-                  }
+                  onClick={handlePreviousPage}
                   disabled={
                     currentPage === 1 ||
                     loading
                   }
+                  aria-label="Página anterior"
                 >
                   ← Anterior
                 </button>
 
                 <div className="pagination-pages">
-
                   {getPageNumbers().map(
                     (page, index) => {
-
-                      if (
-                        page === '...'
-                      ) {
+                      if (page === '...') {
                         return (
                           <span
                             key={`ellipsis-${index}`}
@@ -726,8 +520,7 @@ function Products() {
                           key={page}
                           type="button"
                           className={
-                            page ===
-                            currentPage
+                            page === currentPage
                               ? 'pagination-page-active'
                               : ''
                           }
@@ -743,45 +536,32 @@ function Products() {
                       );
                     }
                   )}
-
                 </div>
 
                 <button
                   type="button"
-                  onClick={
-                    handleNextPage
-                  }
+                  onClick={handleNextPage}
                   disabled={
                     !hasNextPage ||
                     loading
                   }
+                  aria-label="Página siguiente"
                 >
                   Siguiente →
                 </button>
-
               </div>
             )}
-
-            {/* =================================================
-                PAGINATION INFO
-            ================================================= */}
 
             {totalPages > 0 && (
               <div className="pagination-info">
                 Página{' '}
-                <strong>
-                  {currentPage}
-                </strong>{' '}
+                <strong>{currentPage}</strong>{' '}
                 de{' '}
-                <strong>
-                  {totalPages}
-                </strong>
+                <strong>{totalPages}</strong>
               </div>
             )}
-
           </>
         )}
-
     </section>
   );
 }
