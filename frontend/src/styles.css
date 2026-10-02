@@ -2559,3 +2559,56 @@ input:focus-visible {
     height: 46px;
   }
 }
+.field-error {
+  margin: -2px 0 0;
+  color: var(--danger);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.login-form input[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.login-form input[aria-invalid='true']:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 2px rgba(179, 38, 30, 0.1);
+}
+
+.login-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-wrapper input {
+  padding-right: 82px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: var(--off-gray-700);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 4px;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: var(--off-black);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--off-black);
+  outline-offset: 2px;
+}
