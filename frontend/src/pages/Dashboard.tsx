@@ -122,6 +122,18 @@ function Dashboard({
 
             <span>Mi perfil</span>
           </button>
+
+          <button
+            type="button"
+            className="nav-item nav-item-logout"
+            onClick={onLogout}
+          >
+            <span className="nav-icon" aria-hidden="true">
+              ↪
+            </span>
+
+            <span>Cerrar sesión</span>
+          </button>
         </nav>
 
         <div className="sidebar-footer">

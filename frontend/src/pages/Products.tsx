@@ -402,7 +402,7 @@ function Products() {
         products.length > 0 && (
           <>
             <div className="table-container">
-              <table className="products-table">
+              <table className="products-table" key={`${currentPage}-${activeSearch ?? ''}`}>
                 <caption className="sr-only">
                   Catálogo de productos de OFFCORSS
                 </caption>
